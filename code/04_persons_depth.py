@@ -90,6 +90,7 @@ with dai.Device(pipeline) as device:
 
         if frame_depth is not None and in_nn is not None: # should be the case since .get() is used to sync inputs
             person_count = 0
+            distances = []
             height = frame_depth.shape[0]
             width = frame_depth.shape[1]
             for bbox in bboxes:
@@ -101,8 +102,12 @@ with dai.Device(pipeline) as device:
                     y2 = int(bbox.ymax * height)
                     crop_frame = frame_depth[y1:y2, x1:x2]
                     #cv2.imshow("depth_crop", crop_frame)
-                    print(f"Person {person_count} at {cv2.mean(crop_frame)[1]}") # BGR, green channel is depth (more or less)
+                    distances.append(cv2.mean(crop_frame)[1])
+                    print(f"Person {person_count} at {distances[-1]}") # BGR, green channel is depth (more or less)
             print(f"{person_count} persons")
+            if person_count != 0:
+                closest = np.max(np.array(distances))
+                print(f"The closest person is at {closest}")
             print()
 
         if cv2.waitKey(1) == ord('q'):

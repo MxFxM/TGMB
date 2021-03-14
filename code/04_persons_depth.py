@@ -119,19 +119,19 @@ with dai.Device(pipeline) as device:
                     crop_frame = frame_depth[y1:y2, x1:x2]
                     #cv2.imshow("depth_crop", crop_frame)
                     distances.append(cv2.mean(crop_frame)[1])
-                    print(f"Person {person_count} at {distances[-1]}") # BGR, green channel is depth (more or less)
-            print(f"{person_count} persons")
+                    #print(f"Person {person_count} at {distances[-1]}") # BGR, green channel is depth (more or less)
+            #print(f"{person_count} persons")
             closest = 0
             if person_count != 0:
                 closest = np.max(np.array(distances))
-            print(f"The closest person is at {closest}")
+            #print(f"The closest person is at {closest}")
             try:
                 cursor.execute("INSERT INTO peopledetector (time, count, closest) VALUES (?, ?, ?)",
                         (time.time(), person_count, closest))
                 conn.commit()
             except Exception as e:
                 print(f"Commit error with MariaDB: {e}")
-            print()
+            #print()
 
         if cv2.waitKey(1) == ord('q'):
             break

@@ -1,2 +1,3 @@
 tgmb-env/*
 code/models/*
+code/credentials.py

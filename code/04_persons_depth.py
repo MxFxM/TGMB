@@ -7,6 +7,22 @@ import depthai as dai
 import numpy as np
 import time
 
+import credentials
+import mariadb
+
+try:
+    conn = mariadb.connect(
+            user = credentials.mdb_user,
+            password = credentials.mdb_password,
+            host = "192.168.178.61",
+            port = 3306,
+            database = "grafana"
+            )
+except mariadb.Error as e:
+    print(f"Error with MariaDB: {e}")
+    sys.exit(1)
+cursor = conn.cursor()
+
 # Get argument first
 mobilenet_path = str((Path(__file__).parent / Path('models/mobilenet.blob')).resolve().absolute())
 if len(sys.argv) > 1:
@@ -105,9 +121,16 @@ with dai.Device(pipeline) as device:
                     distances.append(cv2.mean(crop_frame)[1])
                     print(f"Person {person_count} at {distances[-1]}") # BGR, green channel is depth (more or less)
             print(f"{person_count} persons")
+            closest = 0
             if person_count != 0:
                 closest = np.max(np.array(distances))
-                print(f"The closest person is at {closest}")
+            print(f"The closest person is at {closest}")
+            try:
+                cursor.execute("INSERT INTO peopledetector (time, count, closest) VALUES (?, ?, ?)",
+                        (time.time(), person_count, closest))
+                conn.commit()
+            except Exception as e:
+                print(f"Commit error with MariaDB: {e}")
             print()
 
         if cv2.waitKey(1) == ord('q'):

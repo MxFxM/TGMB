@@ -7,6 +7,9 @@ import depthai as dai
 import numpy as np
 import time
 
+# limit fps and wait for all cams to get one frame
+sync_cams = True
+
 # Get argument first
 mobilenet_path = str((Path(__file__).parent / Path('models/mobilenet.blob')).resolve().absolute())
 if len(sys.argv) > 1:
@@ -19,7 +22,8 @@ pipeline = dai.Pipeline()
 cam_rgb = pipeline.createColorCamera()
 cam_rgb.setPreviewSize(300, 300)
 cam_rgb.setInterleaved(False)
-cam_rgb.setFps(1)
+if sync_cams:
+    cam_rgb.setFps(1)
 
 # Define a neural network that will make predictions based on the source frames
 detectionNetwork = pipeline.createMobileNetDetectionNetwork()
@@ -97,9 +101,14 @@ with dai.Device(pipeline) as device:
     bboxes_l = []
 
     while True:
-        in_nn = q_nn.get()
-        in_nn_right = q_nn_right.get()
-        in_nn_left = q_nn_left.get()
+        if sync_cams:
+            in_nn = q_nn.tryGet()
+            in_nn_right = q_nn_right.tryGet()
+            in_nn_left = q_nn_left.tryGet()
+        else:
+            in_nn = q_nn.get()
+            in_nn_right = q_nn_right.get()
+            in_nn_left = q_nn_left.get()
         
         if in_nn is not None:
             bboxes = in_nn.detections

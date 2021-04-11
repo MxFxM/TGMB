@@ -7,8 +7,11 @@ import numpy as np
 import time
 import argparse
 
-default_nn1 = str((Path(__file__).parent / Path('models/frozen_inference_graph.blob')).resolve().absolute())
-default_nn2 = str((Path(__file__).parent / Path('models/varroa.blob')).resolve().absolute())
+def to_planar(arr: np.ndarray, shape: tuple) -> list:
+    return [val for channel in cv2.resize(arr, shape).transpose(2, 0, 1) for y_col in channel for val in y_col]
+
+default_nn1 = str((Path(__file__).parent / Path('models/bee_detection_v2021.blob')).resolve().absolute())
+default_nn2 = str((Path(__file__).parent / Path('models/varroa_v2021_202104111503.blob')).resolve().absolute())
 parser = argparse.ArgumentParser()
 parser.add_argument('mobilenet_path', nargs='?', help="Path to mobilenet detection network blob", default=default_nn1)
 parser.add_argument('varroa_path', nargs='?', help="Path to varroa detection network blob", default=default_nn2)
@@ -56,6 +59,7 @@ detection_nn.out.link(xout_nn.input)
 
 # MobilenetSSD label texts
 texts = ["null-0", "bee"]
+health = ["healthy", "varroa"]
 
 # Pipeline defined, now the device is connected to
 with dai.Device(pipeline) as device:
@@ -101,7 +105,10 @@ with dai.Device(pipeline) as device:
             counter += 1
 
         if in_var is not None:
-            print(in_var)
+            result = np.array(in_var.getFirstLayerFp16())
+            print(result, end='') # rename to dense_varroa later!
+            hey = health[np.argmax(result)]
+            print(hey)
 
         # if the frame is available, draw bounding boxes on it and show the frame
         if frame is not None:
@@ -109,7 +116,7 @@ with dai.Device(pipeline) as device:
                 bbox = frame_norm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
                 
                 det_frame = frame[bbox[1]:bbox[3], bbox[0]:bbox[2]]
-                var_data = depthai.NNData()
+                var_data = dai.NNData()
                 var_data.setLayer("0", to_planar(det_frame, (50, 50)))
                 q_var_in.send(var_data)
 

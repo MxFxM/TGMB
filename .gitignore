@@ -1,4 +1,6 @@
 tgmb-env/*
 venv/*
 code/models/*
+code/labels/*
+code/unlabeld/*
 code/credentials.py

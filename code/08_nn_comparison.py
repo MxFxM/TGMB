@@ -8,7 +8,8 @@ import time
 import argparse
 
 test_network = 'mobilenet_1h'
-create_video = True
+test_health = 'fiveclass'
+create_video = False
 
 networks = {
         'mobilenet_1h':{'path':'models/bee_detection_v2021_202104141915.blob','size':300},
@@ -16,7 +17,9 @@ networks = {
         'resnet_4s':{'path':'models/bee_detection_v2021_202104152318_resnet_4s.blob','size':640},
         'resnet_6s':{'path':'models/bee_detection_v2021_202104152318_resnet_6s.blob','size':640},
         'resnet_8s':{'path':'models/bee_detection_v2021_202104152318_resnet_8s.blob','size':640},
-        'resnet_10s':{'path':'models/bee_detection_v2021_202104152318_resnet_10s.blob','size':640}
+        'resnet_10s':{'path':'models/bee_detection_v2021_202104152318_resnet_10s.blob','size':640},
+        'twoclass_old':{'path':'models/varroa_v2021_202104111503.blob','labels':["healthy", "varroa"]},
+        'fiveclass':{'path':'models/varroa_v2021_202104112109_5classes.blob','labels':["ants","healthy","noqueen","robbed","varroa"]}
 }
 
 position_list = []
@@ -91,7 +94,7 @@ def to_planar(arr: np.ndarray, shape: tuple) -> list:
     return [val for channel in cv2.resize(arr, shape).transpose(2, 0, 1) for y_col in channel for val in y_col]
 
 default_nn1 = str((Path(__file__).parent / Path(networks[test_network]['path'])).resolve().absolute())
-default_nn2 = str((Path(__file__).parent / Path('models/varroa_v2021_202104111503.blob')).resolve().absolute())
+default_nn2 = str((Path(__file__).parent / Path(networks[test_health]['path'])).resolve().absolute())
 parser = argparse.ArgumentParser()
 parser.add_argument('mobilenet_path', nargs='?', help="Path to mobilenet detection network blob", default=default_nn1)
 parser.add_argument('varroa_path', nargs='?', help="Path to varroa detection network blob", default=default_nn2)
@@ -139,7 +142,7 @@ detection_nn.out.link(xout_nn.input)
 
 # MobilenetSSD label texts
 texts = ["null-0", "bee"]
-health = ["healthy", "varroa"]
+health = networks[test_health]['labels']
 
 # Pipeline defined, now the device is connected to
 with dai.Device(pipeline) as device:

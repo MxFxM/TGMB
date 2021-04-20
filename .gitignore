@@ -2,5 +2,6 @@ tgmb-env/*
 venv/*
 code/models/*
 code/labels/*
+code/images/*
 code/unlabeld/*
 code/credentials.py

@@ -1,5 +1,5 @@
 # SALT
-## System for Advanced Laser Tracking
+## System for Advanced Laser Targeting
 
 ### General information
 

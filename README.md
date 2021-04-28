@@ -16,3 +16,4 @@ You can import this file in your scripts.
 # Requirements for code
 04 requires credentials for mariadb database.
 Also the python package mariadb (get with pip) is required.
+The later code needs access to the serial port.

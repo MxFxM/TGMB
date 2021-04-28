@@ -2,3 +2,4 @@ opencv-python
 depthai
 lxml
 tqdm
+pyserial

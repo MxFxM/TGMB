@@ -239,8 +239,8 @@ with dai.Device(pipeline) as device:
             lowestPosition = getLowestNewestPosition(now)
             if lowestPosition is not None:
                 #print(lowestPosition[0])
-                x = (lowestPosition[0] / 300) * 60 + 60
-                y = (lowestPosition[1] / 300) * 60 + 60
+                x = 104 - (lowestPosition[0] / 300) * (104-59)
+                y = (lowestPosition[1] / 300) * (82-42) + 42
                 salt.set_angle('x', x)
                 salt.set_angle('y', y)
                 salt.set_laser('on')

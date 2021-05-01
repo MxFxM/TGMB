@@ -13,6 +13,12 @@ An extension to 07.
 Different networks can easily be loaded to quickly compare their results.
 The bees now are assigned an unique id and are tracked over multiple frames.
 
+## 10 destruction
+Here it is all put together.
+Bees are detected and classified by their health.
+If at least one infested bee was found (or it is in demonstration mode with -d), the bees position is targeted with SALT.
+The System for Advanced Laser Tracking.
+
 # Helper code
 These are some useful functions or code snippets.
 
@@ -30,6 +36,10 @@ This will reduce the time to label new images, because only corrections will hav
 Saves one 1080P image per second.
 The filename is the date in the format yyyymmddhhmmss.
 The file is encoded as jpeg.
+
+## salt
+SALT is the System for Advanced Laser Tracking.
+It controlls a servo gimbal and a laser diode.
 
 # Testing code
 This are just snipptes that were created while getting started with the OAK-D.
@@ -57,3 +67,6 @@ The number of persons is then logged to a mariadb database, running on a local R
 ## 05 from scratch
 After previously always modifying an existing example, for this code everything is written by hand.
 The code simply outputs a 500x500 preview of the main camera.
+
+## 09 laser control
+Used to test the control interface to the gimbal system.

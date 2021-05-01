@@ -25,6 +25,13 @@ networks = {
         'fiveclass':{'path':'models/varroa_v2021_202104112109_5classes.blob','labels':["ants","healthy","noqueen","robbed","varroa"]}
 }
 
+default_nn1 = str((Path(__file__).parent / Path(networks[test_network]['path'])).resolve().absolute())
+default_nn2 = str((Path(__file__).parent / Path(networks[test_health]['path'])).resolve().absolute())
+parser = argparse.ArgumentParser()
+parser.add_argument('mobilenet_path', nargs='?', help="Path to mobilenet detection network blob", default=default_nn1)
+parser.add_argument('varroa_path', nargs='?', help="Path to varroa detection network blob", default=default_nn2)
+parser.add_argument('-d', '--demo', action="store_true", help="Switch to demonstration mode, where the lowest tracked index is targeted", default=False)
+args = parser.parse_args()
 position_dict = {}
 next_id = 1
 
@@ -46,9 +53,13 @@ def getLowestNewestPosition(now):
 
     if len(position_dict) > 0:
         for entry in position_dict:
-            if position_dict[entry]['time'] == now and position_dict[entry]['health'] == "healthy":
+            if args.demo:
                 position = position_dict[entry]['position']
                 break
+            else:
+                if position_dict[entry]['time'] == now and position_dict[entry]['health'] == "varroa":
+                    position = position_dict[entry]['position']
+                    break
         return position
     else:
         return None
@@ -101,14 +112,6 @@ def getCenter(box):
 
 def to_planar(arr: np.ndarray, shape: tuple) -> list:
     return [val for channel in cv2.resize(arr, shape).transpose(2, 0, 1) for y_col in channel for val in y_col]
-
-default_nn1 = str((Path(__file__).parent / Path(networks[test_network]['path'])).resolve().absolute())
-default_nn2 = str((Path(__file__).parent / Path(networks[test_health]['path'])).resolve().absolute())
-parser = argparse.ArgumentParser()
-parser.add_argument('mobilenet_path', nargs='?', help="Path to mobilenet detection network blob", default=default_nn1)
-parser.add_argument('varroa_path', nargs='?', help="Path to varroa detection network blob", default=default_nn2)
-parser.add_argument('-s', '--sync', action="store_true", help="Sync RGB output with NN output", default=False)
-args = parser.parse_args()
 
 # Start defining a pipeline
 pipeline = dai.Pipeline()

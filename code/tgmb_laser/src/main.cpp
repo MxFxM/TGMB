@@ -89,7 +89,7 @@ void loop() {
               laser_state = true;
               digitalWriteFast(LASER, HIGH);
               // set the timer to turn off
-              laser_timer = micros() + 500000;
+              laser_timer = micros() + 250000;
             }
           } else {
             USB.println("That is out of bounds.");
@@ -111,7 +111,7 @@ void loop() {
               laser_state = true;
               digitalWriteFast(LASER, HIGH);
               // set the timer to turn off
-              laser_timer = micros() + 500000;
+              laser_timer = micros() + 250000;
             }
           } else {
             USB.println("That is out of bounds.");

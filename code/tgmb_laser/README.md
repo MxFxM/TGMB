@@ -30,4 +30,4 @@ For safety reasons, every wrong laser command will turn the laser off.
 a as 1 turns the laser on and the auto mode off.
 a as a turns the laser off and enables the auto mode.
 a as m returns to the manual mode, so the auto mode is off, and the laser turns off. 
-The auto mode will turn on the laser for 0.5 seconds after a new position for either axis is entered.
+The auto mode will turn on the laser for 0.25 seconds after a new position for either axis is entered.

@@ -6,3 +6,4 @@ code/images/*
 code/unlabeld/*
 code/credentials.py
 code/__pycache__/*
+documentation/*

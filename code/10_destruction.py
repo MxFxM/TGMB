@@ -25,10 +25,10 @@ networks = {
         'fiveclass':{'path':'models/varroa_v2021_202104112109_5classes.blob','labels':["ants","healthy","noqueen","robbed","varroa"]}
 }
 
-position_list = []
-position_update = []
-position_ids = []
+position_dict = {}
 next_id = 1
+
+laser_update_time = 0
 
 video = None
 
@@ -40,60 +40,55 @@ if create_video:
 def getLowestNewestPosition(now):
     # this function is not done!
     # only look at unhealthy bees, so with varroa
-    # find the latest updated bee in the positions
     # if there are multiple newest ones, pick the one with the lowest id
-    global position_list
+    global position_dict
+    position = None
 
-    if len(position_list) > 0:
-        return position_list[0]
+    if len(position_dict) > 0:
+        for entry in position_dict:
+            if position_dict[entry]['time'] == now and position_dict[entry]['health'] == "healthy":
+                position = position_dict[entry]['position']
+                break
+        return position
     else:
         return None
+    return None
 
 
 def checkPosition(position, now):
-    global position_list
-    global position_update
-    global position_ids
+    global position_dict
     global next_id
 
-    x = position[0]
-    y = position[1]
-    
     inthere = False
     thisid = 0
 
-    for n, pos in enumerate(position_list):
-        if x > pos[0]-30 and x < pos[0]+30 and y > pos[1]-30 and y < pos[1]+30:
-            position_list[n] = position
-            position_update[n] = now
-            thisid = position_ids[n]
+    for entry in position_dict:
+        pos = position_dict[entry]['position']
+        if position[0] > pos[0]-50 and position[0] < pos[0]+50 and position[1] > pos[1]-50 and position[1] < pos[1]+50:
+            position_dict[entry]['position'] = position
+            position_dict[entry]['time'] = now
+            thisid = entry
             inthere = True
             break
 
     if not inthere:
-        position_list.append(position)
-        position_update.append(now)
-        position_ids.append(next_id)
+        health_status = "unconfirmed"
+        position_dict[next_id] = {'position':position,'time':now,'health':health_status}
         thisid = next_id
         next_id += 1
 
     return thisid
 
 def updatePositions(now):
-    global position_list
-    global position_update
-    global position_ids
+    global position_dict
 
-    if len(position_update) > 0:
-        remove = []
+    remove = []
+    for entry in position_dict:
+        if now - position_dict[entry]['time'] > 2: # not updated for 2 seconds
+            remove.append(entry)
 
-        for n, last_time in enumerate(position_update):
-            if now - last_time > 3: # not updated for 3 seconds
-                remove.append(n) # add index to remove list
-
-        position_list = [pos for n, pos in enumerate(position_list) if n not in remove]
-        position_update = [tim for n, tim in enumerate(position_update) if n not in remove]
-        position_ids = [pid for n, pid in enumerate(position_ids) if n not in remove]
+    for entry in remove:
+        position_dict.pop(entry, None)
 
 def getCenter(box):
     x1 = box[0]
@@ -145,10 +140,7 @@ varroa_nn.out.link(varroa_nn_xout.input)
 # Create outputs
 xout_rgb = pipeline.createXLinkOut()
 xout_rgb.setStreamName("rgb")
-if(args.sync):
-    detection_nn.passthrough.link(xout_rgb.input)
-else:
-    cam_rgb.preview.link(xout_rgb.input)
+detection_nn.passthrough.link(xout_rgb.input)
 
 xout_nn = pipeline.createXLinkOut()
 xout_nn.setStreamName("nn")
@@ -180,18 +172,14 @@ with dai.Device(pipeline) as device:
         norm_vals[::2] = frame.shape[1]
         return (np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int)
 
+    salt.set_laser('auto')
 
     while True:
         now = time.time()
 
-        if(args.sync):
-            # use blocking get() call to catch frame and inference result synced
-            in_rgb = q_rgb.get()
-            in_nn = q_nn.get()
-        else:
-            # instead of get (blocking) used tryGet (nonblocking) which will return the available data or None otherwise
-            in_rgb = q_rgb.tryGet()
-            in_nn = q_nn.tryGet()
+        # use blocking get() call to catch frame and inference result synced
+        in_rgb = q_rgb.get()
+        in_nn = q_nn.get()
 
         if in_rgb is not None:
             frame = in_rgb.getCvFrame()
@@ -219,12 +207,11 @@ with dai.Device(pipeline) as device:
                 cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 2)
                 cv2.putText(frame, f"{texts[detection.label]} {thisid}", (bbox[0] + 10, bbox[1] + 20),
                             cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-                #cv2.putText(frame, f"{int(detection.confidence*100)}%", (bbox[0] + 10, bbox[1] + 40),
-                #            cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
 
                 in_var = q_var_out.get()
                 result = np.array(in_var.getFirstLayerFp16())
                 hey = health[np.argmax(result)]
+                position_dict[thisid]['health'] = hey
 
                 cv2.putText(frame, f"{hey}", (bbox[0] + 10, bbox[1] + 40),
                             cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
@@ -234,8 +221,7 @@ with dai.Device(pipeline) as device:
             cv2.imshow("rgb", frame)
 
             updatePositions(now)
-            #print(position_list)
-            
+           
             lowestPosition = getLowestNewestPosition(now)
             if lowestPosition is not None:
                 #print(lowestPosition[0])
@@ -243,9 +229,6 @@ with dai.Device(pipeline) as device:
                 y = (lowestPosition[1] / 300) * (82-42) + 42
                 salt.set_angle('x', x)
                 salt.set_angle('y', y)
-                salt.set_laser('on')
-            else:
-                salt.set_laser('off')
 
         if cv2.waitKey(1) == ord('q'):
             if create_video:

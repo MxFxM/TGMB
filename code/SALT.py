@@ -25,6 +25,12 @@ class SALT():
         if status == 'off':
             command = "l0\r\n"
             self.write(command)
+        if status == 'auto':
+            command = "la\r\n"
+            self.write(command)
+        if status == 'manual':
+            command = "lm\r\n"
+            self.write(command)
 
     def close(self):
         self.ser.close()

@@ -1,4 +1,7 @@
 import depthai as dai
+import time
+
+filename = f"{time.strftime('%Y%m%d%H%M%S')}.h265"
 
 # Create pipeline
 pipeline = dai.Pipeline()
@@ -12,8 +15,8 @@ xout.setStreamName('h265')
 
 # Properties
 camRgb.setBoardSocket(dai.CameraBoardSocket.RGB)
-camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_4_K)
-videoEnc.setDefaultProfilePreset(3840, 2160, 30, dai.VideoEncoderProperties.Profile.H265_MAIN)
+camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+videoEnc.setDefaultProfilePreset((1920, 1080), 30, dai.VideoEncoderProperties.Profile.H265_MAIN)
 
 # Linking
 camRgb.video.link(videoEnc.input)
@@ -26,7 +29,7 @@ with dai.Device(pipeline) as device:
     q = device.getOutputQueue(name="h265", maxSize=30, blocking=True)
 
     # The .h265 file is a raw stream file (not playable yet)
-    with open('video.h265', 'wb') as videoFile:
+    with open(filename, 'wb') as videoFile:
         print("Press Ctrl+C to stop encoding...")
         try:
             while True:
@@ -37,4 +40,4 @@ with dai.Device(pipeline) as device:
             pass
 
     print("To view the encoded data, convert the stream file (.h265) into a video file (.mp4) using a command below:")
-    print("ffmpeg -framerate 30 -i video.h265 -c copy video.mp4")
+    print(f"ffmpeg -framerate 30 -i {filename} -c copy filename.mp4")

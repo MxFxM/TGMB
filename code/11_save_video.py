@@ -1,7 +1,8 @@
 import depthai as dai
 import time
 
-filename = f"{time.strftime('%Y%m%d%H%M%S')}.h265"
+VIDEO_PATH = "./streams/"
+video_filename = f"{VIDEO_PATH}{time.strftime('%Y%m%d%H%M%S')}.h265"
 
 # Create pipeline
 pipeline = dai.Pipeline()
@@ -29,7 +30,7 @@ with dai.Device(pipeline) as device:
     q = device.getOutputQueue(name="h265", maxSize=30, blocking=True)
 
     # The .h265 file is a raw stream file (not playable yet)
-    with open(filename, 'wb') as videoFile:
+    with open(video_filename, 'wb') as videoFile:
         print("Press Ctrl+C to stop encoding...")
         try:
             while True:
@@ -40,4 +41,4 @@ with dai.Device(pipeline) as device:
             pass
 
     print("To view the encoded data, convert the stream file (.h265) into a video file (.mp4) using a command below:")
-    print(f"ffmpeg -framerate 30 -i {filename} -c copy filename.mp4")
+    print(f"ffmpeg -framerate 30 -i {video_filename} -c copy filename.mp4")

@@ -8,6 +8,10 @@ Source the environment: source tgmb-env/bin/activate
 
 Install dependencies: python3 -m pip install -r requirements.txt
 
+You might have to set the udev rules: echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="03e7", MODE="0666"' | sudo tee /etc/udev/rules.d/80-movidius.rules
+
+And then reload: sudo udevadm control --reload-rules && sudo udevadm trigger
+
 # Login Credentials
 When using secret credentials for logging in to different services, add a file called "credentials.py" into the directory "code".
 This file is ignored in the .gitignore.

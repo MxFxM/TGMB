@@ -52,7 +52,7 @@ with dai.Device(pipeline) as device:
                 frame_counter += 1
                 if frame_counter == 30:
                     frame_counter = 0
-                    with open(f"{IMAGE_PATH}{time.strftime('%Y%m%d%H%M%S')}", "wb") as f:
+                    with open(f"{IMAGE_PATH}{time.strftime('%Y%m%d%H%M%S')}.jpeg", "wb") as f:
                         f.write(bytearray(frame.getData()))
         except KeyboardInterrupt:
             # Keyboard interrupt (Ctrl + C) detected

@@ -36,9 +36,10 @@ beeTracker.setDetectionLabelsToTrack([1])  # track only bees
 # possible tracking types: ZERO_TERM_COLOR_HISTOGRAM, ZERO_TERM_IMAGELESS
 beeTracker.setTrackerType(dai.TrackerType.ZERO_TERM_COLOR_HISTOGRAM)
 # possible options: SMALLEST_ID, UNIQUE_ID
-beeTracker.setTrackerIdAssigmentPolicy(dai.TrackerIdAssigmentPolicy.SMALLEST_ID)
+beeTracker.setTrackerIdAssigmentPolicy(dai.TrackerIdAssigmentPolicy.UNIQUE_ID)
 # link to image and detections
 detection_nn.passthrough.link(beeTracker.inputDetectionFrame)
+detection_nn.passthrough.link(beeTracker.inputTrackerFrame)
 detection_nn.out.link(beeTracker.inputDetections)
 
 # Create outputs
@@ -59,13 +60,11 @@ texts = ["null-0", "bee"]
 
 # Pipeline defined, now the device is connected to
 with dai.Device(pipeline) as device:
-    # Start pipeline
-    device.startPipeline()
 
     # Output queues will be used to get the rgb frames and nn data from the outputs defined above
     q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
     q_nn = device.getOutputQueue(name="nn", maxSize=4, blocking=False)
-	q_tracker = device.getOutputQueue(name="tracklets", maxSize=4, blocking=False)
+    q_tracker = device.getOutputQueue(name="tracklets", maxSize=4, blocking=False)
 
     start_time = time.monotonic()
     counter = 0
@@ -80,11 +79,10 @@ with dai.Device(pipeline) as device:
 
 
     while True:
-        if(args.sync):
-		# use blocking get() call to catch frame and inference result synced
-		in_rgb = q_rgb.get()
-		in_nn = q_nn.get()
-		in_tracklets = q_tracker.get()
+        # use blocking get() call to catch frame and inference result synced
+        in_rgb = q_rgb.get()
+        in_nn = q_nn.get()
+        in_tracklets = q_tracker.get()
 
         if in_rgb is not None:
             frame = in_rgb.getCvFrame()
@@ -94,9 +92,9 @@ with dai.Device(pipeline) as device:
         if in_nn is not None:
             detections = in_nn.detections
             counter += 1
-		
-		if in_tracklets is not None:
-			trackletsData = in_tracklets.tracklets
+
+        if in_tracklets is not None:
+            trackletsData = in_tracklets.tracklets
 
         # if the frame is available, draw bounding boxes on it and show the frame
         if frame is not None:
@@ -109,27 +107,26 @@ with dai.Device(pipeline) as device:
                             cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
 
             cv2.imshow("rgb", frame)
-		
-			for t in trackletsData:
-				roi = t.roi.denormalize(frame.shape[1], frame.shape[0])
-				x1 = int(roi.topLeft().x)
-				y1 = int(roi.topLeft().y)
-				x2 = int(roi.bottomRight().x)
-				y2 = int(roi.bottomRight().y)
 
-				try:
-					label = labelMap[t.label]
-				except:
-					label = t.label
+            for t in trackletsData:
+                roi = t.roi.denormalize(frame.shape[1], frame.shape[0])
+                x1 = int(roi.topLeft().x)
+                y1 = int(roi.topLeft().y)
+                x2 = int(roi.bottomRight().x)
+                y2 = int(roi.bottomRight().y)
 
-				cv2.putText(frame, str(label), (x1 + 10, y1 + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-				cv2.putText(frame, f"ID: {[t.id]}", (x1 + 10, y1 + 35), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-				cv2.putText(frame, t.status.name, (x1 + 10, y1 + 50), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
-				cv2.rectangle(frame, (x1, y1), (x2, y2), color, cv2.FONT_HERSHEY_SIMPLEX)
+                try:
+                    label = texts[t.label]
+                except:
+                    label = t.label
 
-			cv2.putText(frame, "NN fps: {:.2f}".format(fps), (2, frame.shape[0] - 4), cv2.FONT_HERSHEY_TRIPLEX, 0.4, color)
+                color = (0, 0, 255) #BGR
+                cv2.putText(frame, str(label), (x1 + 10, y1 + 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.putText(frame, f"ID: {[t.id]}", (x1 + 10, y1 + 35), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.putText(frame, t.status.name, (x1 + 10, y1 + 50), cv2.FONT_HERSHEY_TRIPLEX, 0.5, 255)
+                cv2.rectangle(frame, (x1, y1), (x2, y2), color, cv2.FONT_HERSHEY_SIMPLEX)
 
-			cv2.imshow("tracker", frame)
+            cv2.imshow("tracker", frame)
 
         if cv2.waitKey(1) == ord('q'):
             break

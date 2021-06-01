@@ -876,6 +876,40 @@ An index is increased every time a bee enters the frame, so no id is used more t
 Depending on the direction of the bee and at which side the frame was left, a counter can be implemented counting bees in the hive and the overall traffic.
 
 \newpage
+\subsection{Bee Tracking with the DepthAI Tracker}
+
+The Python API for DepthAI comprises an object tracker.
+It can be used on the output of a detection network and is able to track different objects, distinguished by their label, in one single block of the pipeline.
+For tracking, the object tracker uses a kalman filter and the hungarian algorithm.
+The kalman filter is used to estimate unkown system parameters, in this case for example the direction and the velocity of the tracked bee.
+This estimation helps to make a minimal error while tracking.
+The hungarian algorithm is used to make unique 1:1 connections between two groups, in this case for example the detections of the previous and the current frame.
+When setting the tracker up, there are different mehtods of indexing and different tracking algorithms.
+
+Since the health classification is added on top of the index, an index can not repeat.
+Hence the unique ID is used for each tracked object.
+This also means that if the tracker loses track of a bee, a new ID will be assigned to it and the health classification starts over.
+
+The tracker requires three inputs: the detections, the frame the detections were made on, as well as the frame the tracking will be made on.
+In this example setup the tracking and detection frame are the same.
+
+\begin{lstlisting}
+beeTracker = pipeline.createObjectTracker()
+
+beeTracker.setDetectionLabelsToTrack([1])
+beeTracker.setTrackerType(
+    dai.TrackerType.ZERO_TERM_COLOR_HISTOGRAM)
+beeTracker.setTrackerIdAssigmentPolicy(
+    dai.TrackerIdAssigmentPolicy.UNIQUE_ID)
+
+detection_nn.passthrough.link(
+    beeTracker.inputDetectionFrame)
+detection_nn.passthrough.link(
+    beeTracker.inputTrackerFrame)
+detection_nn.out.link(beeTracker.inputDetections)
+\end{lstlisting}
+
+\newpage
 \section{Destruction}
 
 When an infested bee is detected and classified as such, an immediate action is necessary.
@@ -957,10 +991,19 @@ For demonstration purposes the position of the lowest index in the tracker will 
 
 \newpage
 \section{Testing}
+\subsection{Testing on the Bench}
+\subsection{Gathering Real World Data}
+\subsection{Testing in the Field}
 
 \newpage
 \section{Fixes and Improvements}
 \subsection{Possible Improvements}
+
+\newpage
+\section{Special Thanks}
+
+We want to thank the beekeepers of the Bienenverein Flehingen e.v. for allowing us access to their bees.
+It was a unique opportunity to have real world data and some thoughts of experts on the field.
 
 Some maths. \\
 

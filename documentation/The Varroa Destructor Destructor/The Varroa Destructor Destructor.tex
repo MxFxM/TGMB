@@ -991,13 +991,28 @@ For demonstration purposes the position of the lowest index in the tracker will 
 
 \newpage
 \section{Testing}
+
+Testing was divided into different sections.
+After each step of the process, tests were done to ensure the development was going in the right direction.
+The last test session inside and then outside with real bees are documented here.
+
 \subsection{Testing on the Bench}
 \subsection{Gathering Real World Data}
 \subsection{Testing in the Field}
 
 \newpage
 \section{Fixes and Improvements}
+
 \subsection{Implemented Improvements}
+
+The synchronization between the image and the neural network results was not given at first.
+This lead to the detection box always appearing offset from the real bee in the image.
+The fix was to use the passthrough in the pipeline of the neural networks.
+Also in the code, it is better in this case to wait for all data to come in and only then showing the new frame on the screen.
+
+Bee tracking was improved by switching from a very simple tracker in Python to the included object tracker from DepthAI.
+There are further improvements possible, they are listed in the next section.
+
 \subsection{Possible Improvements}
 \subsection{Lessons Learned from an Expert Interview}
 

@@ -1013,7 +1013,43 @@ Also in the code, it is better in this case to wait for all data to come in and 
 Bee tracking was improved by switching from a very simple tracker in Python to the included object tracker from DepthAI.
 There are further improvements possible, they are listed in the next section.
 
-\subsection{Possible Improvements}
+\subsection{Further Improvements}
+
+\subsubsection{Improving the Dataset}
+
+The labeling of bees was done manually.
+Since there was no prior experience, every bee was labeled.
+Even the ones where only part of the bee was visible, because other parts were obstructed, for example by the entry of the hive.
+This lead to all round, dark things being detected as bees.
+A possible improvement would be relabeling only the completely visible bees in all the images and retraining the networks.
+
+The training dataset only holds data from one location.
+Every picture has the same background, making it relatively easy for the network to learn, but at the same time harder to generalize.
+During the project images were collected from two different locations, different hives and from different angles.
+Once these images are labeled they can be used for training as well.
+This will greatly improve generalization.
+
+Furthermore, the newly collected data also includes bees at different distances from the camera.
+The original training dataset used a camera with a fixed distance to the hive entry, again making it more difficult for the network to generalize.
+
+To improve on the health classification it could be beneficial to use higher resolution inputs.
+This can be achieved by not cropping the 300x300 output image of the bee detection network, but using the detected bee positions and cropping the bee from the original high resolution frame.
+The position is already given in relative coordinates, so it would be easy to map them on the original frame.
+
+\subsubsection{Improving the Tracking System}
+
+The tracking system could be further improved by using the depth information.
+With a 3D trajectory estimation, the bees can be tracked more accuratly, especially during flight.
+Additionally, this would provide depth information that can be used for the next idea.
+
+\subsubsection{Improving the Laser System}
+
+The laser (if it is not perfect) could be focussed on the mite exactly by using the depth information from the OAK-D.
+
+To improve the speed of the laser system, a laser galvanometer should be used.
+Instead of moving the laserdiode to aim, the galvanometer uses small mirrors to steer the beam.
+This is faster, because the mirrors are lighter and thus they can be moved more quickly.
+
 \subsection{Lessons Learned from an Expert Interview}
 
 The time with the "Bienenverein Flehingen e.v." was used to interview bee keepers about their experience with the varroa destructor.

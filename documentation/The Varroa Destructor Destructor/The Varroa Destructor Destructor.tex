@@ -998,6 +998,26 @@ The last test session inside and then outside with real bees are documented here
 
 \subsection{Testing on the Bench}
 \subsection{Gathering Real World Data}
+
+To validate the network for bee detection in the field, real data was necessary.
+The local bee keepers from "Bienenverein Flehingen e.v." allowed access to their hives.
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{gathering_field_data.jpg}
+    \caption{Capturing Images and Videos with local Bee Keepers}
+\end{figure}
+
+For a general test of the system it was important not to capture hours of data on one single spot and angle, but to have as much variation as possible.
+More test data can always be created, but the generalization of the model can only be validated this way.
+Too much of the same would only lead to difficulties in the analysis.
+
+All in all, about 10 minutes of data was captured.
+The script was modified to not only capture video data, but at the same time output each encoded frame.
+Since the direct frames would be too similar, only one frame per second was saved as an image.
+This way, about 600 images were captured.
+
+The 600 images show different hives, with different openings, different lighting and different angles.
+
 \subsection{Testing in the Field}
 
 \newpage

@@ -19,6 +19,11 @@ Bees are detected and classified by their health.
 If at least one infested bee was found (or it is in demonstration mode with -d), the bees position is targeted with SALT.
 The System for Advanced Laser Tracking.
 
+## 14 bee tracker
+Updated version of the bee tracking.
+Instead on relying on some very simple Python code, the DepthAI object tracker is used.
+It comprises a calman filter to get a better position estimation of moving objects, in this case the bees.
+
 # Helper code
 These are some useful functions or code snippets.
 
@@ -40,6 +45,19 @@ The file is encoded as jpeg.
 ## salt
 SALT is the System for Advanced Laser Tracking.
 It controlls a servo gimbal and a laser diode.
+
+## 11 save video
+Saves video.
+
+## 12 save images
+Saves images.
+
+## 13 save images and video
+The code used for capturing data.
+1080P video is captured at 30 frames per second and encoded as h265.
+At the same time individual frames are encoded as jpeg.
+Both outputs can be saved.
+To save disk space, only every 30th frame is stored, meaning one frame per second.
 
 # Testing code
 This are just snipptes that were created while getting started with the OAK-D.
@@ -70,3 +88,9 @@ The code simply outputs a 500x500 preview of the main camera.
 
 ## 09 laser control
 Used to test the control interface to the gimbal system.
+
+## 15 test with images
+System performance was tested with the images captured at the bee hives.
+
+## 16 test with video
+The captured video from the visit to the bee keepers was tested with this code.

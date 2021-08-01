@@ -1031,11 +1031,9 @@ This is generally save and neither persons nor bees were harmed in the process.
 
 \subsection{Testing in the Field}
 
-It was not possible to test the bee detection and targeting system in the field.
-However, with the captured videos and images, it is possible to evaluate the performance of the neural networks.
-
 In this documentation the images with detections are shown.
 These images are extracted frames of the video that is shown in the video documentation.
+The bee detections were scaled to fit on the full resolution frame, instead of the resized 300x300 frame used by the network for the detection.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{20210529160136_det.png}
@@ -1055,6 +1053,52 @@ Another aspect could be the size of the bee on the image as a result of the disc
 Bees that appear smaller or larger then bees in the training set will not be detected, since they don't look the same.
 The bees on the grass are probably detected, because this actual case was in the training dataset.
 The dataset does not include bees on a white or high contrast background.
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{20210530144200_det.png}
+    \caption{Emptry Hive Entry}
+\end{figure}
+
+In the next test frame, only very few bees are at the hive entry.
+The angle has changed slightly in comparison to the previous image.
+Note also, that there is a darker piece of wood as the landing zone now.
+
+The prominent bee in the center of the frame is detected nicely.
+There are no wings visible, because the bee is in flight.
+It is very sharp anyhow, thanks to the high frame rate of the camera.
+One negative point would be the bounding box extending towards the front and back of the bee.
+This might be due to the scaling from a 300x300 square frame to a 1920x1080 rectangular frame.
+
+In the lower right of the frame, there are some bees hiding in the shadows of the hive right in the corner of the entry slot.
+This again seems to be a problem with the contrast.
+In this case the contrast is too low.
+
+This is the second time where contrast seems to have a huge impact in the performance of the detection network.
+It is recommended to use an enclosed box in the front of the hive, where images are taken.
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{20210530150605_det.png}
+    \caption{Hive Entry from the Top}
+\end{figure}
+
+The last test frame shows yet another hive entry in a top down view.
+This is very similar to the original training dataset used.
+
+At first glance it seems that the network performed better in this case.
+On closer inspection is becomes obvious, that four of the five detected "bees" inside the bounding boxes are false detections.
+The previous frames did not detect all bees, but at least there were no false detections.
+
+In this image, the pattern of the grass with the shadows from the hive seem to trick the detection network.
+A clean, smooth background would improve the detection reliability.
+
+Once more the contrast in the shadows is very small.
+In this particular image there are no bees present there, but if there were, the detection would be very difficult.
+It is even difficult to find bees by eye.
+
+The blurr on the center bee does not seem to influence the detection in this case.
+
+Similarly to the first image shown, there are three bees on the left side of the frame that were not detected.
+Again these bees are smaller than the bees in the training dataset, due to the increased distance to the camera.
 
 \newpage
 \section{Fixes and Improvements}
@@ -1097,6 +1141,17 @@ This leads to all the bees being more or less the same size.
 Differently sized bees will not look the same, since the filters that are trained inside the network do not account for larger (or smaller) sizes.
 A more diversified dataset would be beneficial.
 It would be interesting to see if cropped bee images could be scaled and put on different places of the frame to manually create training images.
+
+For a general bee detection, the contrast of the images should vary.
+If the goal is to have a good working, encapsulated system, it is beneficial to have artificial lighting to have a constant contrast in every frame.
+There is a startup in germany which is also working with artificial intelligence on bee hives.
+They also use very strong lights inside a box to get consistent results of the visual detection.
+
+Having a clean smooth and consistent background for the detection would improve the reliability.
+This also speaks for a separate box in which the camera would be placed.
+
+It is good to have these learnings now, when there is not too much effort put into labeling images and training the network.
+The loss from re-doing these tasks is outweight by the benefits gained from better detections.
 
 \subsubsection{Improving the Tracking System}
 

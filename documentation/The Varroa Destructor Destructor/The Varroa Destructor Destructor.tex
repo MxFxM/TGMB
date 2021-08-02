@@ -998,6 +998,9 @@ The last test session inside and then outside with real bees are documented here
 
 \subsection{Testing on the Bench}
 
+The networks for detection and health classification were already tested during the training process.
+What was missing is the proof of concept of the whole system working together, meaning bee detection, tracking and targeting with SALT.
+
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{test_setup.jpg}
     \caption{Test Setup on the Bench}
@@ -1016,11 +1019,32 @@ This allows a rather clean setup, with only the power and USB wire going from th
 On the right side of the frame a small monitor is placed to see the results of the detection and classification networks.
 The keyboard in the front of the image is used to program the code and start the execution.
 
-\newpage
 The field of view of the camera is tested and marked on the wall with some sticky tape.
 
-Holding image into Camera
-Laser shown in video documentation
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{indoor_test.jpg}
+    \caption{Indoor Tests on the Bench}
+\end{figure}
+
+To test the system different images were held in front of the camera.
+At times the training images were printed out and at other times, like shown in the image here, a very "general bee" was used.
+The network generalized the bees very well, so far that even two black dots were detected as a bee.
+More on this in the sections with improvements.
+
+In the picture the OAK-D is at the bottom of the image.
+Right above it is the SALT.
+A light red shade of the laser can be seen just above the green PLA 3D printed laser head.
+The two dots on the wall represent the lower left and lower right corner of the cameras frame.
+By holding the fake bee between them, the detection network is able to pick it up and track its movement.
+The laser is then focused right on the location of the bee.
+
+By having a consistent setup, the maximum angles can be programmed in SALT.
+The position of the bee on the frame can then be represented as two angles, the horizontal and vertical one.
+By having the laser pointer centered on both axis, the angles can be calculated using simple maths.
+For small angles, the sine function is approximately linear, which simplifies the calculation even more.
+
+The working bee tracking is demonstrated in the video documentation.
+This is a still image taken out of the video.
 
 \subsection{Gathering Real World Data}
 

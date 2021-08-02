@@ -27,6 +27,32 @@
 
 \section*{Abstract}
 
+The project tries to build a system to detect bees entering their hive visually.
+Bees infested by the varroa destructor, a kind of mite infesting bee hives, can be separated from the rest.
+
+A pipeline setup is proposed, comprising a neural network trained via transfer learning to detect bees, another neural network build from the ground up to classify bees by their health status and a tracking software to track bees walking or flying through the frame.
+The pipeline is build using the DepthAI Python API and runs on the OAK-D directly.
+
+A test setup is build as a proof of concept, comprising the OAK-D for running inference on the bee detection and health classification network on the edge and a Jetson Nano as the host computer.
+Additionally a 3D printed laser targeting system called SALT (System for Advanced Laser Targeting) was build.
+Using SALT the varroa mite can be targeted and heated to a level where it lets go of the bee, without compromising the bees health.
+
+Thanks to a local bee keeper club it was possible to test the bee detection on the field.
+This allowed for a great learning opportunity, giving a lot of ideas to improve upon in further projects.\\
+
+The project allowed for learning and insights into the topics:
+
+\begin{itemize}
+    \item Preparation of datasets for machine learning
+    \item Object detection with Mobilenet
+    \item Image classification
+    \item Building a neural network from scratch
+    \item OpenVINO
+    \item Google Colab
+    \item Object tracking algorithms
+    \item Mechanical design of a targeting system
+\end{itemize}
+
 \newpage
 \section{OpenCV AI Competition 2021}
 

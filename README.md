@@ -1,6 +1,11 @@
 # TGMB
 The German Mite Busters Repository for the OpenCV AI Competition 2021
 
+# Documentation
+Documentation is here and a short video seriese on YouTube:
+
+https://www.youtube.com/playlist?list=PLd_aTu_oC2t4qxTNdH-ToK-ty6c6wK3zz
+
 # Setup
 Create a virtual environment: python3 -m venv tgmb-env
 

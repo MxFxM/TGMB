@@ -1,6 +1,8 @@
 # TGMB
 The German Mite Busters Repository for the OpenCV AI Competition 2021
 
+![detection results](https://raw.githubusercontent.com/MxFxM/TGMB/main/detection_comparison/20210530150512_det_4.png "Bee detection results")
+
 # Documentation
 Documentation is here and a short video seriese on YouTube:
 
